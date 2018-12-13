@@ -1,10 +1,9 @@
 package org.lyx.netty.custom.codec;
 
-import java.io.IOException;
-
+import io.netty.buffer.ByteBuf;
 import org.jboss.marshalling.Marshaller;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 
 public class MarshallingEncoder {
 	
@@ -22,6 +21,7 @@ public class MarshallingEncoder {
 			//必须要知道当前的数据位置是哪: 起始数据位置
 			//长度属性的位置索引
 			int lengthPos = out.writerIndex();
+			//startPos = out.writerIndex();
 			//占位写操作:先写一个4个字节的空的内容，记录在起始数据位置，用于设置内容长度
 			out.writeBytes(LENGTH_PLACEHOLDER);
 			ChannelBufferByteOutput output = new ChannelBufferByteOutput(out);
@@ -35,7 +35,6 @@ public class MarshallingEncoder {
 		} finally {
 			marshaller.close();
 		}
-		
 		
 	}
 

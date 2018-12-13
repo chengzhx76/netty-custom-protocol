@@ -12,6 +12,8 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.lyx.netty.NettyConstant;
 import org.lyx.netty.custom.codec.NettyMessageDecoder;
 import org.lyx.netty.custom.codec.NettyMessageEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -20,8 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 public class Client {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
+
 	public static void main(String[] args) throws Exception {
-		new Client().connect(NettyConstant.PORT, NettyConstant.REMOTEIP);
+		Client client = new Client();
+		Thread hook = client.new ShutDown();
+		hook.setName("Shutdown");
+		Runtime.getRuntime().addShutdownHook(hook);
+		client.connect(NettyConstant.PORT, NettyConstant.REMOTEIP);
 	}
 
 	private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -36,9 +44,11 @@ public class Client {
 					.handler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						public void initChannel(SocketChannel ch) throws Exception {
+							// 进站
 							ch.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
+							// 出站
 							ch.pipeline().addLast(new NettyMessageEncoder());
-							ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+							ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60 * 5));
 							ch.pipeline().addLast("LoginAuthHandler", new LoginAuthReqHandler());
 							ch.pipeline().addLast("HeartBeatHandler", new HeartBeatReqHandler());
 						}
@@ -46,10 +56,10 @@ public class Client {
 			// 发起异步连接操作
 			ChannelFuture future = b.connect(new InetSocketAddress(host, port),
 					new InetSocketAddress(NettyConstant.LOCALIP, NettyConstant.LOCAL_PORT)).sync();
-			
+
 			//手动发测试数据，验证是否会产生TCP粘包/拆包情况
 //			Channel c = future.channel();
-//			
+//
 //			for (int i = 0; i < 500; i++) {
 //				NettyMessage message = new NettyMessage();
 //				Header header = new Header();
@@ -60,7 +70,7 @@ public class Client {
 //				message.setBody("我是请求数据" + i);
 //				c.writeAndFlush(message);
 //			}
-			
+
 			future.channel().closeFuture().sync();
 		} finally {
 			// 所有资源释放完成之后，清空资源，再次发起重连操作
@@ -80,5 +90,11 @@ public class Client {
 			});
 		}
 	}
-
+	public class ShutDown extends Thread{
+		// 退出执行
+		@Override
+		public void run(){
+			LOGGER.info("shutdown [OK]");
+		}
+	}
 }

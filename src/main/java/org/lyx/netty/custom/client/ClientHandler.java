@@ -1,21 +1,20 @@
 package org.lyx.netty.custom.client;
 
-import org.lyx.netty.custom.struct.NettyMessage;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import org.lyx.netty.custom.struct.NettyMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHandler  extends ChannelInboundHandlerAdapter {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
 	
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     	try {
-    		
     	 	NettyMessage message = (NettyMessage)msg;
-        	System.err.println("Client receive message from server: " + message.getBody());
-    		
+            LOGGER.info("客户端从服务器接收消息：", message.getBody());
 		} finally {
 			ReferenceCountUtil.release(msg);
 		}
@@ -24,7 +23,7 @@ public class ClientHandler  extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
-    	System.err.println("----------客户端数据读异常-----------");
+        LOGGER.info("----------客户端数据读异常-----------");
         ctx.close();
     }
     

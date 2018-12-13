@@ -1,16 +1,15 @@
 package org.lyx.netty.custom.client;
 
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lyx.netty.MessageType;
 import org.lyx.netty.custom.struct.Header;
 import org.lyx.netty.custom.struct.NettyMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 由于采用长连接通信，在正常业务运行期间，双方通过心跳和业务消息维持链路，任何一方都不需要主动关闭链接。<br/>
@@ -32,23 +31,23 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 
 	private volatile ScheduledFuture<?> heartBeat;
 
+	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		LOGGER.info("-->HeartBeatReqHandler-->channelRead");
 		NettyMessage message = (NettyMessage) msg;
 		// 握手成功，主动发送心跳消息
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()) {
-			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 5000,
-					TimeUnit.MILLISECONDS);
+			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 60 * 2, TimeUnit.SECONDS);
 		} else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
 			LOGGER.info("Client receive server heart beat message : ---> {}", message);
-		} else
+		} else {
 			ctx.fireChannelRead(msg);
+		}
 	}
 
 	/**
 	 * 发送心跳消息的任务线程
-	 * 
 	 * @author landyChris
-	 *
 	 */
 	private class HeartBeatTask implements Runnable {
 		private final ChannelHandlerContext ctx;
@@ -58,12 +57,14 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 		}
 
 		public void run() {
+            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->run->发送心跳包");
 			NettyMessage heatBeat = buildHeatBeat();
-			LOGGER.info("Client send heart beat messsage to server : ---> {}", heatBeat);
+			LOGGER.info("客户端发送心跳包到服务端 : ---> {}", heatBeat);
 			ctx.writeAndFlush(heatBeat);
 		}
 
 		private NettyMessage buildHeatBeat() {
+            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->构建心跳包");
 			NettyMessage message = new NettyMessage();
 			Header header = new Header();
 			header.setType(MessageType.HEARTBEAT_REQ.value());
@@ -72,7 +73,9 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 		}
 	}
 
+	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        LOGGER.info("-->HeartBeatReqHandler-->exceptionCaught-->");
 		cause.printStackTrace();
 		//断连期间，心跳定时器停止工作，不再发送心跳请求信息
 		if (heartBeat != null) {

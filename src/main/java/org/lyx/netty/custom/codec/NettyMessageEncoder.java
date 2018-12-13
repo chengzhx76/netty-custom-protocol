@@ -25,6 +25,8 @@ public class NettyMessageEncoder  extends MessageToByteEncoder<NettyMessage> {
 	
 	@Override
 	protected void encode(ChannelHandlerContext ctx, NettyMessage message, ByteBuf sendBuf) throws Exception {
+		LOGGER.info("-->NettyMessageEncoder-->encode-->出站编码 Start");
+		LOGGER.info("-->MSG：{}", message);
 		LOGGER.info("-->NettyMessageEncoder-->encode-->出站编码 Start MSG：{}", message);
 		if(message == null || message.getHeader() == null){
 			throw new Exception("编码失败,没有数据信息!");
@@ -78,6 +80,7 @@ public class NettyMessageEncoder  extends MessageToByteEncoder<NettyMessage> {
 		//总长度是在header协议的第二个标记字段中
 		//第一个参数是长度属性的索引位置
 		sendBuf.setInt(4, sendBuf.readableBytes() - 8);
+
 		LOGGER.info("-->NettyMessageEncoder-->encode-->出站编码 End");
 	}
 

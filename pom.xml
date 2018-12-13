@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.lyx.netty</groupId>
-  <artifactId>netty-custom-protocol-server</artifactId>
+  <artifactId>netty-custom-protocol</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>netty自定义协议</description>
@@ -121,7 +121,7 @@
 						<!--生成的jar中，不要包含pom.xml和pom.properties这两个文件 -->
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
-							<mainClass>org.lyx.netty.custom.server.Server</mainClass>
+							<mainClass>org.lyx.netty.custom.client.Client</mainClass>
 							<!-- 打包时MANIFEST.MF文件不记录时间版本 -->
 							<useUniqueVersions>false</useUniqueVersions>
 							<addClasspath>true</addClasspath>
