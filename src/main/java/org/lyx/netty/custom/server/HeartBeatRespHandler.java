@@ -28,6 +28,7 @@ public class HeartBeatRespHandler extends ChannelInboundHandlerAdapter {
 	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		LOGGER.info("-->HeartBeatRespHandler-->channelRead-->");
 		NettyMessage message = (NettyMessage) msg;
 		// 返回心跳应答消息
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_REQ.value()) {
@@ -35,11 +36,13 @@ public class HeartBeatRespHandler extends ChannelInboundHandlerAdapter {
 			NettyMessage heartBeat = buildHeatBeat();
 			LOGGER.info("Send heart beat response message to client : ---> {}" ,heartBeat);
 			ctx.writeAndFlush(heartBeat);
-		} else
+		} else {
 			ctx.fireChannelRead(msg);
+		}
 	}
 
 	private NettyMessage buildHeatBeat() {
+		LOGGER.info("-->HeartBeatRespHandler-->buildHeatBeat-->构建返回包");
 		NettyMessage message = new NettyMessage();
 		Header header = new Header();
 		header.setType(MessageType.HEARTBEAT_RESP.value());

@@ -1,9 +1,7 @@
 package org.lyx.netty.custom.server;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lyx.netty.MessageType;
 import org.lyx.netty.ResultType;
 import org.lyx.netty.custom.struct.Header;
@@ -11,10 +9,9 @@ import org.lyx.netty.custom.struct.NettyMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author landyChris
@@ -28,20 +25,17 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 	 * 考虑到安全，链路的建立需要通过基于IP地址或者号段的黑白名单安全认证机制，本例中，多个IP通过逗号隔开
 	 */
 	private Map<String, Boolean> nodeCheck = new ConcurrentHashMap<String, Boolean>();
-	private String[] whitekList = { "127.0.0.1", "192.168.56.1" };
+	private String[] whitekList = { "127.0.0.1", "10.10.70.201", "10.10.67.45", "192.168.56.1" };
 
-	/**
-	 * Calls {@link ChannelHandlerContext#fireChannelRead(Object)} to forward to
-	 * the next {@link ChannelHandler} in the {@link ChannelPipeline}.
-	 * 
-	 * Sub-classes may override this method to change behavior.
-	 */
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->");
 		NettyMessage message = (NettyMessage) msg;
 
 		// 如果是握手请求消息，处理，其它消息透传
+		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证是否是登录请求");
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_REQ.value()) {
+			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证登录");
 			String nodeIndex = ctx.channel().remoteAddress().toString();
 			NettyMessage loginResp = null;
 			// 重复登陆，拒绝
@@ -59,12 +53,16 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 					}
 				}
 				loginResp = isOK ? buildResponse(ResultType.SUCCESS) : buildResponse(ResultType.FAIL);
-				if (isOK)
+				if (isOK) {
+					LOGGER.info("标记登录成功->IP：{}", ip);
 					nodeCheck.put(nodeIndex, true);
+				}
 			}
-			LOGGER.info("The login response is : {} body [{}]",loginResp,loginResp.getBody());
+			LOGGER.info("The login response is : {} body [{}]",loginResp, loginResp.getBody());
 			ctx.writeAndFlush(loginResp);
 		} else {
+			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->不是登录请求");
+			// 透传
 			ctx.fireChannelRead(msg);
 		}
 	}
@@ -79,6 +77,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 	 * @return
 	 */
 	private NettyMessage buildResponse(ResultType result) {
+		LOGGER.info("-->LoginAuthRespHandler-->buildResponse-->构建返回包");
 		NettyMessage message = new NettyMessage();
 		Header header = new Header();
 		header.setType(MessageType.LOGIN_RESP.value());
@@ -88,6 +87,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 	}
 
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		LOGGER.info("-->LoginAuthRespHandler-->exceptionCaught-->");
 		cause.printStackTrace();
 		nodeCheck.remove(ctx.channel().remoteAddress().toString());// 删除缓存
 		ctx.close();

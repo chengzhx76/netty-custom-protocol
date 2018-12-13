@@ -1,14 +1,5 @@
 package org.lyx.netty.custom.client;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import org.lyx.netty.NettyConstant;
-import org.lyx.netty.custom.codec.NettyMessageDecoder;
-import org.lyx.netty.custom.codec.NettyMessageEncoder;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -18,6 +9,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.lyx.netty.NettyConstant;
+import org.lyx.netty.custom.codec.NettyMessageDecoder;
+import org.lyx.netty.custom.codec.NettyMessageEncoder;
+
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -66,7 +65,6 @@ public class Client {
 		} finally {
 			// 所有资源释放完成之后，清空资源，再次发起重连操作
 			executor.execute(new Runnable() {
-				@Override
 				public void run() {
 					try {
 						TimeUnit.SECONDS.sleep(1);

@@ -1,26 +1,31 @@
 package org.lyx.netty.custom.codec;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.lyx.netty.custom.struct.Header;
-import org.lyx.netty.custom.struct.NettyMessage;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.lyx.netty.custom.struct.Header;
+import org.lyx.netty.custom.struct.NettyMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class NettyMessageEncoder  extends MessageToByteEncoder<NettyMessage> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(NettyMessageEncoder.class);
 
 	private MarshallingEncoder marshallingEncoder;
 	
 	public NettyMessageEncoder() throws IOException {
+		LOGGER.info("-->NettyMessageEncoder-->NettyMessageEncoder");
 		this.marshallingEncoder = new MarshallingEncoder();
 	}
 	
 	
 	@Override
 	protected void encode(ChannelHandlerContext ctx, NettyMessage message, ByteBuf sendBuf) throws Exception {
+		LOGGER.info("-->NettyMessageEncoder-->encode-->出站编码 Start MSG：{}", message);
 		if(message == null || message.getHeader() == null){
 			throw new Exception("编码失败,没有数据信息!");
 		}
@@ -73,10 +78,7 @@ public class NettyMessageEncoder  extends MessageToByteEncoder<NettyMessage> {
 		//总长度是在header协议的第二个标记字段中
 		//第一个参数是长度属性的索引位置
 		sendBuf.setInt(4, sendBuf.readableBytes() - 8);
-		
-		
-		
-		
+		LOGGER.info("-->NettyMessageEncoder-->encode-->出站编码 End");
 	}
 
 }

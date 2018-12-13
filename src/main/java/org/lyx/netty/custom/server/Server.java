@@ -16,7 +16,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 public class Server {
-
 	
 	public static void main(String[] args) throws Exception {
 		//ONE:
@@ -41,7 +40,7 @@ public class Server {
 			protected void initChannel(SocketChannel sc) throws Exception {
 				sc.pipeline().addLast(new NettyMessageDecoder(1024*1024*5, 4, 4));
 				sc.pipeline().addLast(new NettyMessageEncoder());
-				sc.pipeline().addLast("readTimeoutHandler",new ReadTimeoutHandler(50));
+				sc.pipeline().addLast("readTimeoutHandler",new ReadTimeoutHandler(60 * 5));
 				sc.pipeline().addLast("LoginAuthHandler",new LoginAuthRespHandler());
 				sc.pipeline().addLast("HeartBeatHandler",new HeartBeatRespHandler());
 				sc.pipeline().addLast(new ServerHandler());

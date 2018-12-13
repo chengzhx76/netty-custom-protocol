@@ -1,15 +1,16 @@
 package org.lyx.netty.custom.codec;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.lyx.netty.custom.struct.Header;
-import org.lyx.netty.custom.struct.NettyMessage;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import org.lyx.netty.custom.struct.Header;
+import org.lyx.netty.custom.struct.NettyMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * LengthFieldBasedFrameDecoder 是为了解决 拆包粘包等问题的
@@ -18,8 +19,9 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
  */
 public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(NettyMessageDecoder.class);
 	private MarshallingDecoder marshallingDecoder;
-	
+
 	/**
 	 * 那减8应该是因为要把CRC和长度本身占的减掉了。
 	 * @param maxFrameLength 第一个参数代表最大的序列化长度   1024*1024*5
@@ -29,11 +31,13 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 	 */
 	public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
 		super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
+		LOGGER.info("-->NettyMessageDecoder-->NettyMessageDecoder");
 		this.marshallingDecoder = new MarshallingDecoder();
 	}
 	
 	@Override
 	protected Object decode(ChannelHandlerContext ctx,  ByteBuf in) throws Exception {
+		LOGGER.info("-->NettyMessageDecoder-->decode-start");
 		//1 调用父类(LengthFieldBasedFrameDecoder)方法:
 		ByteBuf frame  = (ByteBuf)super.decode(ctx, in);
 		
@@ -74,6 +78,8 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 		if(frame.readableBytes() > 4) { //大于4个字节，肯定就有数据了（4个字节是内容长度的占位）
 			message.setBody(marshallingDecoder.decode(frame));
 		}
+		LOGGER.info("-->NettyMessageDecoder-->decode-->{}", message);
+		LOGGER.info("-->NettyMessageDecoder-->decode-End");
 		return message;
 	}
 
