@@ -48,7 +48,7 @@ public class Client {
 							ch.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
 							// 出站
 							ch.pipeline().addLast(new NettyMessageEncoder());
-							ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60 * 5));
+							ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60));
 							ch.pipeline().addLast("LoginAuthHandler", new LoginAuthReqHandler());
 							ch.pipeline().addLast("HeartBeatHandler", new HeartBeatReqHandler());
 						}

@@ -20,7 +20,7 @@ public class Server {
 	public static void main(String[] args) throws Exception {
 		//ONE:
 		//1 用于接受客户端连接的线程工作组
-		EventLoopGroup boss = new NioEventLoopGroup();
+		EventLoopGroup boss = new NioEventLoopGroup(1);
 		//2 用于对接受客户端连接读写操作的线程工作组
 		EventLoopGroup work = new NioEventLoopGroup();
 		
@@ -40,14 +40,14 @@ public class Server {
 			protected void initChannel(SocketChannel sc) throws Exception {
 				sc.pipeline().addLast(new NettyMessageDecoder(1024*1024*5, 4, 4));
 				sc.pipeline().addLast(new NettyMessageEncoder());
-				sc.pipeline().addLast("readTimeoutHandler",new ReadTimeoutHandler(60 * 5));
-				sc.pipeline().addLast("LoginAuthHandler",new LoginAuthRespHandler());
-				sc.pipeline().addLast("HeartBeatHandler",new HeartBeatRespHandler());
+				sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60));
+				sc.pipeline().addLast("LoginAuthHandler", new LoginAuthRespHandler());
+				sc.pipeline().addLast("HeartBeatHandler", new HeartBeatRespHandler());
 				sc.pipeline().addLast(new ServerHandler());
 			}
 		 });
 		
-		ChannelFuture cf = b.bind(NettyConstant.REMOTEIP,NettyConstant.PORT).sync();
+		ChannelFuture cf = b.bind(NettyConstant.REMOTEIP, NettyConstant.PORT).sync();
 		
 		System.out.println("Netty server start ok : "
 				+ (NettyConstant.REMOTEIP + " : " + NettyConstant.PORT));

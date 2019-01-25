@@ -37,7 +37,7 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 		NettyMessage message = (NettyMessage) msg;
 		// 握手成功，主动发送心跳消息
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()) {
-			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 60 * 2, TimeUnit.SECONDS);
+			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 30, TimeUnit.SECONDS);
 		} else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
 			LOGGER.info("Client receive server heart beat message : ---> {}", message);
 		} else {
@@ -56,6 +56,7 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 			this.ctx = ctx;
 		}
 
+		@Override
 		public void run() {
             LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->run->发送心跳包");
 			NettyMessage heatBeat = buildHeatBeat();

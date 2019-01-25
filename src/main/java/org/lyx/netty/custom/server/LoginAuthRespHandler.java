@@ -46,8 +46,8 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 				InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
 				String ip = address.getAddress().getHostAddress();
 				boolean isOK = false;
-				for (String WIP : whitekList) {
-					if (WIP.equals(ip)) {
+				for (String wip : whitekList) {
+					if (wip.equals(ip)) {
 						isOK = true;
 						break;
 					}
@@ -86,6 +86,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 		return message;
 	}
 
+	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		LOGGER.info("-->LoginAuthRespHandler-->exceptionCaught-->");
 		cause.printStackTrace();
