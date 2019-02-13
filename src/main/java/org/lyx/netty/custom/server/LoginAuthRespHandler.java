@@ -29,13 +29,13 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->");
+//		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->");
 		NettyMessage message = (NettyMessage) msg;
 
 		// 如果是握手请求消息，处理，其它消息透传
-		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证是否是登录请求");
+//		LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证是否是登录请求");
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_REQ.value()) {
-			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证登录");
+//			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->验证登录");
 			String nodeIndex = ctx.channel().remoteAddress().toString();
 			NettyMessage loginResp = null;
 			// 重复登陆，拒绝
@@ -58,10 +58,10 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 					nodeCheck.put(nodeIndex, true);
 				}
 			}
-			LOGGER.info("The login response is : {} body [{}]",loginResp, loginResp.getBody());
+//			LOGGER.info("The login response is : {} body [{}]",loginResp, loginResp.getBody());
 			ctx.writeAndFlush(loginResp);
 		} else {
-			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->不是登录请求");
+//			LOGGER.info("-->LoginAuthRespHandler-->channelRead-->不是登录请求");
 			// 透传
 			ctx.fireChannelRead(msg);
 		}
@@ -77,7 +77,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 	 * @return
 	 */
 	private NettyMessage buildResponse(ResultType result) {
-		LOGGER.info("-->LoginAuthRespHandler-->buildResponse-->构建返回包");
+//		LOGGER.info("-->LoginAuthRespHandler-->buildResponse-->构建返回包");
 		NettyMessage message = new NettyMessage();
 		Header header = new Header();
 		header.setType(MessageType.LOGIN_RESP.value());
@@ -88,7 +88,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		LOGGER.info("-->LoginAuthRespHandler-->exceptionCaught-->");
+//		LOGGER.info("-->LoginAuthRespHandler-->exceptionCaught-->");
 		cause.printStackTrace();
 		nodeCheck.remove(ctx.channel().remoteAddress().toString());// 删除缓存
 		ctx.close();

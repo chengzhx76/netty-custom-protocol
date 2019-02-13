@@ -28,13 +28,13 @@ public class HeartBeatRespHandler extends ChannelInboundHandlerAdapter {
 	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		LOGGER.info("-->HeartBeatRespHandler-->channelRead-->");
+//		LOGGER.info("-->HeartBeatRespHandler-->channelRead-->");
 		NettyMessage message = (NettyMessage) msg;
 		// 返回心跳应答消息
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_REQ.value()) {
-			LOGGER.info("Receive client heart beat message : ---> {} " ,message);
+//			LOGGER.info("Receive client heart beat message : ---> {} " ,message);
 			NettyMessage heartBeat = buildHeatBeat();
-			LOGGER.info("Send heart beat response message to client : ---> {}" ,heartBeat);
+//			LOGGER.info("Send heart beat response message to client : ---> {}" ,heartBeat);
 			ctx.writeAndFlush(heartBeat);
 		} else {
 			ctx.fireChannelRead(msg);

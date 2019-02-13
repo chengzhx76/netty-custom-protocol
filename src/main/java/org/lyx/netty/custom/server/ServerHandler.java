@@ -22,7 +22,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx /*NETTY服务上下文*/, Object msg /*实际的传输数据*/) throws Exception {
-		LOGGER.info("-->ServerHandler-->channelRead-->");
+//		LOGGER.info("-->ServerHandler-->channelRead");
     	NettyMessage requestMessage = (NettyMessage)msg;
 
 		LOGGER.info("服务器从客户端接收消息：{}", requestMessage.getBody());
@@ -35,6 +35,14 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 		responseMessage.setHeader(header);
 		responseMessage.setBody("我是响应数据: " + requestMessage.getBody());
 		ctx.writeAndFlush(responseMessage);
+
+
+		System.out.println("-----Start----> " + Thread.currentThread().getName());
+
+		Thread.sleep(20000);
+
+		System.out.println("-----End------> " + Thread.currentThread().getName());
+
     	
     }
     

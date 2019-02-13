@@ -1,10 +1,6 @@
 package org.lyx.netty.custom.server;
 
 
-import org.lyx.netty.NettyConstant;
-import org.lyx.netty.custom.codec.NettyMessageDecoder;
-import org.lyx.netty.custom.codec.NettyMessageEncoder;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -14,6 +10,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.lyx.netty.NettyConstant;
+import org.lyx.netty.custom.codec.NettyMessageDecoder;
+import org.lyx.netty.custom.codec.NettyMessageEncoder;
 
 public class Server {
 	
@@ -23,7 +22,7 @@ public class Server {
 		EventLoopGroup boss = new NioEventLoopGroup(1);
 		//2 用于对接受客户端连接读写操作的线程工作组
 		EventLoopGroup work = new NioEventLoopGroup();
-		
+
 		//TWO:
 		//3 辅助类。用于帮助我们创建NETTY服务
 		ServerBootstrap b = new ServerBootstrap();
@@ -40,7 +39,7 @@ public class Server {
 			protected void initChannel(SocketChannel sc) throws Exception {
 				sc.pipeline().addLast(new NettyMessageDecoder(1024*1024*5, 4, 4));
 				sc.pipeline().addLast(new NettyMessageEncoder());
-				sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60));
+				sc.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(60 * 9));
 				sc.pipeline().addLast("LoginAuthHandler", new LoginAuthRespHandler());
 				sc.pipeline().addLast("HeartBeatHandler", new HeartBeatRespHandler());
 				sc.pipeline().addLast(new ServerHandler());
@@ -49,8 +48,7 @@ public class Server {
 		
 		ChannelFuture cf = b.bind(NettyConstant.REMOTEIP, NettyConstant.PORT).sync();
 		
-		System.out.println("Netty server start ok : "
-				+ (NettyConstant.REMOTEIP + " : " + NettyConstant.PORT));
+		System.out.println("Netty server start ok : " + (NettyConstant.REMOTEIP + " : " + NettyConstant.PORT));
 		
 		//释放连接
 		cf.channel().closeFuture().sync();

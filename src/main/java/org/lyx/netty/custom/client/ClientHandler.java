@@ -14,7 +14,7 @@ public class ClientHandler  extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     	try {
     	 	NettyMessage message = (NettyMessage)msg;
-            LOGGER.info("客户端从服务器接收消息：", message.getBody());
+            LOGGER.info("客户端从服务器接收消息：{}", message.getBody());
 		} finally {
 			ReferenceCountUtil.release(msg);
 		}

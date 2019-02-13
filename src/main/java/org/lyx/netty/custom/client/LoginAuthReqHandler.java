@@ -19,13 +19,13 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		LOGGER.info("-->LoginAuthReqHandler-->channelActive->通道激活，发送登录请求验证...");
+//		LOGGER.info("-->LoginAuthReqHandler-->channelActive->通道激活，发送登录请求验证...");
 		ctx.writeAndFlush(buildLoginReq());
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		LOGGER.info("-->LoginAuthReqHandler->channelRead->");
+//		LOGGER.info("-->LoginAuthReqHandler->channelRead");
 		NettyMessage message = (NettyMessage) msg;
 
 		// 如果是握手应答消息，需要判断是否认证成功
@@ -51,7 +51,7 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
 	 * @return
 	 */
 	private NettyMessage buildLoginReq() {
-        LOGGER.info("-->LoginAuthReqHandler-->buildLoginReq-->构建登录报文...");
+//        LOGGER.info("-->LoginAuthReqHandler-->buildLoginReq-->构建登录报文...");
 		NettyMessage message = new NettyMessage();
 		Header header = new Header();
 		header.setType(MessageType.LOGIN_REQ.value());
@@ -61,7 +61,7 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.info("-->LoginAuthReqHandler-->exceptionCaught-->");
+//        LOGGER.info("-->LoginAuthReqHandler-->exceptionCaught");
 		ctx.fireExceptionCaught(cause);
 	}
 }

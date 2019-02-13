@@ -30,13 +30,13 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 	 */
 	public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
 		super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
-		LOGGER.info("-->NettyMessageDecoder-->NettyMessageDecoder");
+//		LOGGER.info("-->NettyMessageDecoder-->NettyMessageDecoder");
 		this.marshallingDecoder = new MarshallingDecoder();
 	}
 	
 	@Override
 	protected Object decode(ChannelHandlerContext ctx,  ByteBuf in) throws Exception {
-		LOGGER.info("-->NettyMessageDecoder-->decode-->进站解码 Start");
+//		LOGGER.info("-->NettyMessageDecoder-->decode-->进站解码 Start");
 		//1 调用父类(LengthFieldBasedFrameDecoder)方法:
 		ByteBuf frame  = (ByteBuf)super.decode(ctx, in);
 		
@@ -77,8 +77,8 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 		if(frame.readableBytes() > 4) { //大于4个字节，肯定就有数据了（4个字节是内容长度的占位）
 			message.setBody(marshallingDecoder.decode(frame));
 		}
-		LOGGER.info("-->MSG：{}", message);
-		LOGGER.info("-->NettyMessageDecoder-->decode-->进站解码 End");
+//		LOGGER.info("-->MSG：{}", message);
+//		LOGGER.info("-->NettyMessageDecoder-->decode-->进站解码 End");
 		return message;
 	}
 

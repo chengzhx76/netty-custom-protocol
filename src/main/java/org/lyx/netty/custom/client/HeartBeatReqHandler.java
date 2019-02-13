@@ -33,11 +33,11 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		LOGGER.info("-->HeartBeatReqHandler-->channelRead");
+//		LOGGER.info("-->HeartBeatReqHandler-->channelRead");
 		NettyMessage message = (NettyMessage) msg;
 		// 握手成功，主动发送心跳消息
 		if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()) {
-			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 30, TimeUnit.SECONDS);
+			heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 30 * 9, TimeUnit.SECONDS);
 		} else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
 			LOGGER.info("Client receive server heart beat message : ---> {}", message);
 		} else {
@@ -58,14 +58,14 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 
 		@Override
 		public void run() {
-            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->run->发送心跳包");
+//            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->run->发送心跳包");
 			NettyMessage heatBeat = buildHeatBeat();
-			LOGGER.info("客户端发送心跳包到服务端 : ---> {}", heatBeat);
+//			LOGGER.info("客户端发送心跳包到服务端 : ---> {}", heatBeat);
 			ctx.writeAndFlush(heatBeat);
 		}
 
 		private NettyMessage buildHeatBeat() {
-            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->构建心跳包");
+//            LOGGER.info("-->HeartBeatReqHandler-->HeartBeatTask-->构建心跳包");
 			NettyMessage message = new NettyMessage();
 			Header header = new Header();
 			header.setType(MessageType.HEARTBEAT_REQ.value());
@@ -76,7 +76,7 @@ public class HeartBeatReqHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.info("-->HeartBeatReqHandler-->exceptionCaught-->");
+//        LOGGER.info("-->HeartBeatReqHandler-->exceptionCaught");
 		cause.printStackTrace();
 		//断连期间，心跳定时器停止工作，不再发送心跳请求信息
 		if (heartBeat != null) {
